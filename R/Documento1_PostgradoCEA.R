@@ -1,4 +1,4 @@
-### R code from vignette source '~/Dropbox/ceba/doc/100_Posgrado/Documento1_PostgradoCEA.Rnw'
+### Código R modificado de http://dx.doi.org/10.6084/m9.figshare.3394789
 ### Encoding: UTF-8
 
 ###################################################
@@ -8,23 +8,10 @@ require(xml2)
 require(rvest)
 require(plotrix)
 
-paquetes <- (.packages())
-paquetes <- paquetes[!(paquetes %in% c("stats", "graphics", "grDevices", "utils", "datasets", "methods", "base", "deldir", "DBI", "RMySQL"))]
-
-luq <- function(x,contar.NA=FALSE) {
-	if (contar.NA==F) {
-	x <- x[!is.na(x)]
-	}
- length(unique(x))
- }
-
-
-
 ###################################################
-### code chunk number 2: citas paquetes
+### code chunk number 3: Descargar un archivo
 ###################################################
-cat(paste("\\texttt{",paquetes,"} \\citep{pqt::",paquetes,"}",sep="",collapse="; "))
-
+output <- "../output"
 
 ###################################################
 ### code chunk number 3: Descargar un archivo
@@ -183,25 +170,33 @@ rs[rs$area.corregida %in% c("ESTUDIOS SOCIALES DE LA CIENCIA","ESTUDIOS DE LA CI
 ###################################################
 dts <- table(rs$Año,rs$area.corregida)
 ss <- colSums(dts)>19
-par(mar=c(5,4,0,7))
 
-matplot(as.numeric(rownames(dts)),
+svg(file=sprintf("%s/Egresados_IVIC_CEA.svg",output),width=8,height=8)
+par(mar=c(5,4,3,7))
+
+matplot(as.numeric(rownames(dts)), main="Postgrados del Centro de Estudios Avanzados, IVIC",
         apply(dts,2,cumsum)[,ss & !(colnames(dts) %in% "ARTICULO 9")],
                             type="l",lty=1,lwd=3,col=rainbow(14),
-                            xlab="Año",ylab="Acumulado de egresados") 
+                            xlab="Año",ylab="Número acumulado de egresados por postgrado") 
 axis(4,at=colSums(dts)[ss & !(colnames(dts) %in% "ARTICULO 9")],
      lab=sub("BIOLOGIA DE LA REPRODUCCION","BIO. REPRO.",
          sub("ESTUDIOS SOCIALES DE LA","EST. SOC.",
              colnames(dts)[ss & !(colnames(dts) %in% "ARTICULO 9")])),
      cex.axis=.5,las=2)
+
+if (require(png) & exists("logo"))
+    rasterImage(logo, 1975, 170, 1990, 250)
+
 lines(as.numeric(rownames(dts)),cumsum(rowSums(dts[,!ss])),lty=3)
 axis(4,at=sum(rowSums(dts[,!ss])),"Otras",cex.axis=.75,las=2)
-
+dev.off()
 
 ###################################################
 ### code chunk number 23: PiramideEgresados
 ###################################################
 require(plotrix)
+
+
 piramide <- with(rs,tapply(Estudiante,list(Año,tolower(Sexo)),length))
 pyramid.plot(piramide[,"femenino"],piramide[,"masculino"],
              labels=rownames(piramide),gap=4,##xlim=c(-35,-1,1,35),
