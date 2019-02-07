@@ -1,0 +1,87 @@
+---
+title: "El bosque seco de la Caatinga: En Peligro Crítico"
+author: "José R. Ferrer Paris (\\@jrfep)"
+date: "Enero 15, 2019"
+output: html_document
+bibliography: blog_RLEamericas.bib
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, eval = TRUE)
+```
+
+La ***Lista Roja de Ecosistemas*** de la **Unión Internacional para la Conservación de la Naturaleza** (UICN) es un estandard global para la evaluación de riesgo de colapso de los ecosistemas.
+
+Acabamos de publicar un trabajo sobre la evaluación de los bosques del Nuevo Mundo en la revista *Conservation Letters* [@FerrerParis2019].  Por primera vez la Lista Roja de Ecosistemas es aplicada de manera sistemática y con indicadores cuantitativos a una escala continental. Este trabajo titulado [**An ecosystem risk assessment of temperate and tropical forests of the Americas with an outlook on future conservation strategies**](http://dx.doi.org/10.1111/conl.12623) fue iniciado por [Provita](http://www.provita.org.ve/) en el marco del proyecto *From Alaska to Patagonia* [@AlaskaPatagonia] y contó con la colaboración y participación de varias instituciones y miembros del [Grupo Temático de la Lista Roja de Ecosistemas](https://iucnrle.org/about-rle/how-we-work/rle-team/).
+
+El artículo condensa un trabajo de muchos años con detalles interesantes que no pueden ser expuestos en menos de 3000 palabras. Por ese motivo voy a compartir una serie de contribuciones sobre los casos que, desde mi punto de vista, merecen más atención y permiten ilustrar los retos de una evaluación de esta magnitud. 
+
+Quiero comenzar con el ecosistema tipo del *Bosque Seco Estacional de la Caatinga* o *Caatinga Seasonal Dry Forest*, y mostrar como hicimos para estimar los cambios recientes en su distribución y proyectarlos en el futuro para poder aplicar uno de los subcriterios de la Lista Roja de Ecosistemas, que en este caso particular es el que determina el nivel de riesgo de esta unidad.
+
+## Bosque Seco Estacional de la Caatinga
+
+En Brazil, la palabra 'Caatinga' se usa para designar o describir una amplia región geográfica o bioma con una vegetación muy variada pero dominada por un semi-árido. Ésta región ocupa la mayor parte del noreste de Brazil, y tiene una gran densidad poblacional que provoca una gran presión sobre los recursos naturales, por lo que la vegetación natural ha sido ampliamente intervenida o remplazada por otros usos de la tierra, y en otros sitios sufre procesos de desertificación [@Albuquerque2012].
+
+Para nuestro análisis nos enfocamos en los bosques secos estacionales de esta región, tal y como han sido delimitados por el sistema internacional de clasificación de la vegetación (IVC o EcoVeg) recientemente aplicado a nivel continental [@Faber-Langendoen2017].
+
+```{r MapaUbicacion,fig.align='center',fig.width=5,fig.height=5,fig.cap='Figura 1: Distribución potencial del Bosque Seco Estacional de la Caatinga en el Noreste de Brasil'}
+par(mar=c(0,0,0,0))
+plot(Americas,col="grey67",border="grey87")
+plot(CaatingaTSDF,col=c(NA,"red"),add=T,legend=F)
+##plot(e.xy,add=T,col=rgb(.5,.1,.2,.5),lwd=2)
+text(c(2423214,  2629340, -2641611),
+     c(-1133168.0,  2743588.1,   188453.4),
+     c("Brasil","Oceano Atlántico","Oceano Pacífico"))
+##box()
+```
+
+## ¿Donde está el bosque y cuánto queda?
+
+En el mapa este tipo de bosque aparece como una unidad de gran tamaño, pero debemos recordar que esta es una distribución 'potencial', resultado de la aplicación de un algoritmo de clasificación basado en variables ambientales y geográficas y calibrado con observaciones de campo.
+
+En realidad la cobertura de bosque en el presente es mucho menor. Para estimar esta área de bosque remanente podemos usar diferentes fuentes de datos. En nuestro caso usamos estimados basados en imágenes de sensores remotos procesadas.
+
+Una fuente muy utilizada son los datos de "[Global Forest Change](https://earthenginepartners.appspot.com/science-2013-global-forest/download_v1.2.html)" de @Hansen2013:GFC, que estiman el porcentaje de *cobertura arbórea* en base a un mosaico global de imágenes LandSat. 
+
+```{r MapaBosqueGFC,fig.align='center',fig.width=5,fig.height=7,fig.cap='Figura 2: Porcentaje de cobertura arbórea del Bosque Seco Estacional de la Caatinga en el Noreste de Brasil'}
+plot(BSQ2000,col=brewer.pal(9,"Greens"),main="Bosque Seco Estacional de la Caatinga")
+title(main="% Cobertura arbórea en 2000 según Hansen et al. (2013)",line=.5,cex.main=1)
+title(sub=robin,line=2.5,cex.sub=.56)
+plot(CaatingaTSDF,col=c(rgb(.1,.1,.1,.35),NA),add=T,legend=F)
+```
+
+Si calculamos la distribución de estos valores en el área de distribución potencial del Bosque Seco Estacional de la Caatinga, vemos que predominan valores bajos de cobertura arbórea. Si consideramos un umbral mínimo de 40% de cobertura arbórea para definir el bosque, entonces podemos concluir que este bosque está confinado a menos del 15% de su distribución potencial. 
+
+```{r HistBosqueGFC,fig.align='center',fig.width=7,fig.height=5,fig.cap='Figura 3: Histograma (izq.) y función empírica de distribución acumulada (der.) del porcentaje de cobertura arbórea en el área de distribución potencial del Bosque Seco Estacional de la Caatinga en el Noreste de Brasil'}
+layout(matrix(c(1,2),ncol=2,byrow=T))
+hist(values(BSQ2000)[values(CaatingaTSDF)==1],freq=T,xlab="% cobertura arbórea",ylab="Frecuencia",main="")
+fx <- ecdf(values(BSQ2000)[values(CaatingaTSDF)==1])
+plot(fx,xlab="% cobertura arbórea",ylab="Frecuencia acumulada",main="")
+segments(40,0,40,fx(40),lty=2,lwd=2)
+##text(40,fx(40),sprintf("%0.1f %% del área con valor < 40%%",fx(40)*100),cex=.65,adj=-.1)
+```
+Otra fuente de datos para estimar la cobertura boscosa es la serie de tiempo de  [clasificación de cobertura de la tierra basada en imágenes de sensores Modis](
+https://lpdaac.usgs.gov/about/news_archive/modisterra_land_cover_types_yearly_l3_global_005deg_cmg_mod12c1) [@ModisLC1]. Según esta fuente la cobertura predominante en esta área son sabanas, pastizales y arbustales.
+
+```{r MapaBosqueModis}
+tt[,c("Clase","Area.km2","Porcentaje")]
+```
+
+## Aplicación del criterio A2b de Lista Roja de Ecosistemas
+
+Para nuestro análisis combinamos los mapas de cobertura arbórea y cobertura de la tierra para estimar el área con cobertura boscosa del Bosque Seco Estacional de la Caatinga entre el año 2001 y el 2012. A partir de esta serie de tiempo ajustamos un modelo de regresión generalizado, concretamente una regresión quasi-poisson con función de enlace logarítmica que permite describir la tasa proporcional de disminución para una ventana de tiempo de 50 años. 
+
+```{r BosquePresenteFuturo,fig.align='center',fig.width=7,fig.height=5,fig.cap='Figura 4: Estimado de la tendencia en cobertura boscosa (línea sólida) e intervalo de confianza de 90% (líneas punteadas) para el Bosque Seco Estacional de la Caatinga en el Noreste de Brasil'}
+plot(bosque~fecha,ylim=c(0,1e4),xlim=c(2001,2051),pch=19,col="springgreen3",cex=1.8,ylab="Estimado de cobertura boscosa en km²",xlab="Año")
+matlines(yys,data.frame(exp(prd1$fit),exp(prd1$fit+(1.645*prd1$se.fit)),exp(prd1$fit-(1.645*prd1$se.fit))),lty=c(1,3,3),col="maroon",lwd=2)
+```
+Según esta estimación, la tasa actual de perdida de cobertura boscosa resultaría en una pérdida casi total del Bosque Seco Estacional de la Caatinga para el año 2050.
+
+Aplicamos los umbrales para el criterio A2b de la Lista Roja de Ecosistemas de la UICN [@Guidelines2017]: un ecosistema con un perdida de área mayor al 80% en un periodo de 50 años que incluye el pasado, presente y futuro, se debe considerar **En Peligro Crítico** (**CR**).
+
+## Para finalizar
+
+Esta contribución incluye sólo algunos de los pasos aplicados para la evaluación de una de las unidades escogidas para el análisis a nivel continental. En las próximas contribuciones seguiré mostrando ejemplos para describir otras unidades de evaluación y aclarar detalles de los pasos de análisis.
+
+Pueden consultar los criterios y categorías en algunas de las referencias citadas al final de este documento o en la siguiente [hoja resumen](https://iucnrle.org/static/media/uploads/references/Capacity%20building/Red%20List%20of%20Ecosystems%20Criteria%20Summary%20Sheet%202017/resumen_lre_categorias_y_crit%C3%A9rios_2.2_sp.pdf). Para consultar otros documentos y conseguir información adicional visiten la [página web de la Lista Roja de Ecosistemas de la UICN](https://iucnrle.org/resources/). Por último les insto a seguir la cuenta oficial de Twitter de la Lista Roja de Ecosistemas \@[redlisteco](https://twitter.com/redlisteco) para mantenerse actualizados sobre el impacto de esta herramienta de conservación. 
+
+### Referencias

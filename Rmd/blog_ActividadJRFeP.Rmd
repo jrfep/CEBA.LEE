@@ -1,0 +1,49 @@
+---
+title: "Actualización sobre mi presencia en la red"
+author: "José R. Ferrer Paris (@jrfep)"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, eval = TRUE)
+```
+
+# Publicaciones y citas
+
+He publicado hasta la fecha [16 artículos en revistas arbitradas](http://jrferrerparis.info/homo-faber/publicaciones/) y [más de 70 documentos](http://jrferrerparis.info/homo-faber/otras-contribuciones/) en portales o colecciones electrónicas.
+
+Para una selección de `r nrow(dcs)` documentos preparé un análisis de impacto usando varios indicadores. En estos documentos acumulo `r sum(dcs$g.cites,na.rm=T)` citas según [Google Scholar](https://scholar.google.co.ve/citations?user=A2Thq5UAAAAJ&hl=en) o `r sum(dcs$cr.cites,na.rm=T)` citas según [Crossref](https://www.crossref.org/) y el score acumulado de impacto según [Altmetric](https://www.altmetric.com/) es `r sum(dcs$score)`.
+
+En el siguiente gráfico muestro la distribución de citas y *altmetric scores* para estos documentos:
+
+
+```{r Publicaciones,fig.align='center',fig.width=9,fig.height=7,fig.cap='Figura 1: Impacto de publicaciones de JRFeP'}
+par(mar=c(18,4,1,1),las=2,cex.axis=0.75)
+barplot(t(dcs[,c("score","g.cites","cr.cites")]),
+        names.arg=substr(sapply(as.character(dcs$ref),function(x) strsplit(x,"). ")[[1]][2]),1,50),col=brewer.pal(3,"Set3"),cex.axis=1)
+legend("topright",c("Altmetric score","GS cites","CR cites"),fill=brewer.pal(3,"Set3"))
+```
+
+# Contribuciones en portales y redes
+Soy de una generación casi obsoleta, de ese grupo de personas que aprendió a usar y aprovechar las computadoras ANTES de que se popularizara internet, de aquellos que pasaban horas configurando su entorno local y respaldaban su trabajo en disquettes o CDs, que usaba *[pine](https://en.wikipedia.org/wiki/Pine_(email_client))* para ver su correo en un terminal UNIX y se conectaba a canales *[IRC](https://en.wikipedia.org/wiki/Internet_Relay_Chat)*, ANTES de la nube, ANTES...
+
+Sin embargo, con el paso del tiempo, uno termina convenciendose de que debe aprende también a aprovechar las herramientas nuevas que indudablemente hacen las cosas más fáciles y ayudan a mejorar la productividad.
+
+Una de las grandes ventajas de las herramientas web modernas es que le permiten a los usuarios mostrar su desempeño y actividad, y dejar un testimonio (probablemente mucho más fugaz de lo que pensamos) de nuestras contribuciones a una comunidad local o global. 
+
+Aquí pues les dejo una breve instantánea de mis contribuciones a una selección de páginas y proyectos que reflejan parte de mi actividad en la web de los últimos años:
+
+```{r calendario Actividad,fig.align='center',fig.width=9,fig.height=9,fig.cap='Figura 2: Calendario de actividad en diversos portales web'}
+actividad <- data.frame(table(fechas))
+actividad$cats <- as.numeric(cut(actividad$Freq,c(0,1,2,4,8,16,32,Inf)))
+calendarHeat(actividad$fechas, actividad$cats, 
+             varname="web de JRFeP")
+```
+
+En este gráfico simplemente muestro la distribución de contribuciones a lo largo de los últimos cinco años en los siguientes perfiles:
+
+* Contribuciones a wikipedia en [inglés](https://en.wikipedia.org/wiki/Usuario:Jrfep) y [español](https://es.wikipedia.org/wiki/Usuario:Jrfep)
+* Mensajes en twitter de las cuentas [jrfep](https://twitter.com/jrfep), [NeoMapas](https://twitter.com/NeoMapas) y [Rsaurio](https://twitter.com/Rsaurio)
+* Entradas de mi blog en WordPress
+* Contribuciones a un par de proyectos en [github](https://github.com/jrfep)
+
+Durante este año, espero ir aumentando constantemente mis contribuciones y mostrar aquí como voy progresando.
