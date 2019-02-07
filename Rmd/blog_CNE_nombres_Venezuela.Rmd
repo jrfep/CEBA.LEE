@@ -1,0 +1,92 @@
+---
+title: "Todos los nombres (I)"
+author: "José R. Ferrer Paris (@jrfep)"
+date: "Febrero 10, 2019"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+```
+
+Los nombres personales y apellidos son un fascinante tema, [no sólo para obras literarias](https://es.wikipedia.org/wiki/Todos_los_nombres), sino también para para análisis estadísticos muy variados, en las áreas de ciencias sociales, ciencias históricas, medicina y ecología humana.
+
+Los apellidos se heredan según sistemas tradicionales y/o legales, y vienen a ser una medida indirecta de la genealogía siguiendo (en la mayor parte de los casos) la línea paternal. Por otro lado los nombres son escogidos siguiendo muchas pautas sociales distintas y pueden reflejar tradiciones, idiosincracias o modas temporales.
+
+Existen muchos ejemplos de análisis estadísticos relacionadas con la historia (o [futuro](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0018105)) de los nombres, con su [distribución geográfica](http://research.ucc.ie/doi/atlas), etc.
+
+En esta serie de análisis voy a utilizar los datos del [registro electoral de Venezuela del año 2012](http://www.cne.gov.ve/web/registro_electoral_descarga/abril2012/) para ilustrar algunas curiosidades sobre nombres y apellidos venezolanos en general (y zulianos en particular), y mostrar ejemplos de código en *R* que puede ser útil para visualizar la distribución y frecuencia de nombres en Venezuela.
+
+*Advertencia:* La base de datos del registro electoral tiene información muy valiosa, pero también incluye algunos errores de transcripción e inconsistencias que pueden entorpecer los análisis. La versión que utilizo ha sido parcialmente depurada para facilitar los análisis, pero no ha sido posible realizar una revisión y validación completa. 
+
+```{r matriz}
+str(m0)
+```
+
+## Diversidad de apellidos
+
+Para un primer ejercicio utilizamos una matriz de la frecuencia de aparición de los apellidos por estado. La base de datos original contiene datos de `r nrow(x)` personas registradas, pero después de descartar algunos datos dudosos o incompletos, la matriz resultante incluye aproximadamente `r ceiling(sum(m0)/2)` personas, entre las que hay al menos `r nrow(m0)` apellidos diferentes.
+
+El estado Delta Amacuro tiene solo `r sum(m0[,"DELTA AMACURO"]>0)` apellidos diferentes con una población registrada de aproximadamente `r sum(m0[,"DELTA AMACURO"])`, mientras que el estado con mayor riqueza de apellidos es Miranda con `r sum(m0[,"MIRANDA"]>0)` entre `r sum(m0[,"MIRANDA"])` personas. Para cada estado comparamos esta riqueza (número de apellidos) con la diversidad de Shannon que puede interpretarse como el logaritmo de la riqueza ajustada por la abundancia relativa de cada elemento. 
+
+```{r, examplePlot, eval='true', results='verbatim', fig.height=4, fig.width=4}
+S <- log(colSums(m0>0))
+H <- diversity(t(m0))
+
+oo <- order(S)
+par(mar=c(10,4,0,4),las=2)
+plot(S[oo],axes=F,xlab="",ylab="Número de apellidos",ylim=c(5,10),pch=19,col="peru",cex=1.2)
+points(H[oo],col="slateblue4",pch=19,cex=1.2)
+axis(1,1:length(oo),names(S)[oo])
+axis(2,log(c(500,1000,3000,6000,9000,12000)),c(500,1000,3000,6000,9000,12000))
+axis(4)
+box()
+```
+
+Entre los cinco estados con más apellidos la diversidad sigue un patrón muy similar, lo que sugiere un distribución más o menos homogenea de las abundancias ("alta equidad"). Sin embargo el estado Zulia, en sexto lugar de riqueza, tiene una diversidad notablemente menor que aquellos. Esta diferencia puede deberse a una distribución más heterogénea ("alta dominancia" de algunos apellidos).
+
+Los estados Trujillo, Mérida, Nueva Esparta y Sucre tienen la menor diversidad de apellidos y por consiguiente son los que muestran mayor dominancia de un grupo reducido de apellidos.
+
+## Diferencias regionales
+
+En un segundo paso vamos a comparar la frecuencia de los apellidos entre estados para calcular su similitud en composición.
+
+```{r, examplePlot, eval='true', results='verbatim', fig.height=4, fig.width=4}
+S <- log(colSums(m0>0))
+H <- diversity(t(m0))
+
+oo <- order(S)
+par(mar=c(10,4,0,4),las=2)
+plot(S[oo],axes=F,xlab="",ylab="Número de apellidos",ylim=c(5,10),pch=19,col="peru",cex=1.2)
+points(H[oo],col="slateblue4",pch=19,cex=1.2)
+axis(1,1:length(oo),names(S)[oo])
+axis(2,log(c(500,1000,3000,6000,9000,12000)),c(500,1000,3000,6000,9000,12000))
+axis(4)
+box()
+```
+
+
+
+## Nombres zulianos
+
+Es notable como algunos apellidos representan de idiosincrácias regionales. En la novela "[Sobre la misma tierra](https://www.goodreads.com/book/show/12863608-sobre-la-misma-tierra)" nuestro novelista [Rómulo Gallegos](https://es.wikipedia.org/wiki/R%C3%B3mulo_Gallegos) representó a una sociedad marabina con raices Wayuu e influencias alemanas, pero con una fuerte identidad regional. Al anti-héroe de la historia lo bautizó con el nombre de Demetrio Montiel, o "Montiel Montiel de los Montieles". 
+
+Mi primera pregunta es muy sencilla: ¿Es éste el apellido más zuliano?
+
+
+
+```{r, examplePlot, eval='true', results='verbatim', fig.height=4, fig.width=4}
+
+```
+
+Por lo visto Gallegos debió manejar muy bien el análisis estadístico de los apellidos... En esta selecta lista efectivamente aparece Montiel como un serio candidato al apellido más zuliano. Según el registro electoral de 2012 en Venezuela hay más de 45 mil "Montieles" en edad de votar y más del 85% están registrados en el Zulia.
+
+Sin embargo hay que considerar otras alternativas no menos zulianas. Palmar es un apellido menos frecuente en el país (sólo 25 mil), pero más del 90% de ellos están en el Zulia. Los apellidos Urdaneta y Villalobos son más numerosos en Venezuela y en el Zulia, pero la proporción de ellos registrados en el estado es de "apenas" 79%. 
+
+Estos cuatro apellidos pueden considerarse "indicativos" del estado Zulia, pues son mucho más frecuentes aquí que en el resto del país. Lo cual quiere decir que si conoces a alguien con ese apellido, lo más probable es que le gusten las [mandocas](https://es.wikipedia.org/wiki/Maracaibo#Gastronom%C3%ADa) y escuche [gaitas en diciembre](https://es.wikipedia.org/wiki/Gaita_zuliana).
+
+Sin embargo, si te encuentras en el estado Zulia, es más probable que te encuentres con más González que con cualquier otro de los apellidos zulianos. En el Zulia hay más de 240 mil González (o 1,4 veces más que los Palmar, Montiel, Urdaneta y Villalobos juntos), que representan al menos 26% de los González de Venezuela.
+
+
+## Listo por hoy
+
+Para comentarios y sugerencias pueden escribirme a mi cuenta de Twitter [@jrfep](http://twitter.com/jrfep).
