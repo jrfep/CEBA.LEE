@@ -25,7 +25,9 @@ for (k in c(1:24,99)) {
 ##grep MUNICIPIO estado*/parroquial.php* > lista.municipios
 ##grep Descargue estado*/parroquial.php* > lista.parroquias
 
-
+dts <- data.frame(R=log(colSums(m1>0)),
+             H=diversity(t(m1)))
+dts <- dts[order(dts$R),]
 
 wget 'http://www.cne.gov.ve/web/registro_electoral_descarga/abril2012/municipal.php?e=22'
 grep zip municipal.php\?e\=22 
