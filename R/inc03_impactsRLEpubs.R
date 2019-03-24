@@ -115,12 +115,14 @@ for (bsc in c("ma z","lei g","keith da","murray nj","regan tj","wilson al")) {
 }
 
 list.authors %>% count(auth_alt4, sort = TRUE) ## demasiado
+list.authors <- subset(list.authors,!valid_name %in% "na na")
 
 length(unique(list.authors$auth_alt3))
 length(unique(list.authors$valid_name))
 
 
 mtz.LRE <- as.matrix(with(subset(list.authors,doi %in% subset(RLEpubs,RLE)$DOI),table(doi,auth_alt3)))
+
 
 mtz.OTR <- as.matrix(with(subset(list.authors,doi %in% subset(RLEpubs,RLTS | KBA)$DOI),table(doi,auth_alt3)))
 ##save(file="~/mi.git/CEBA.LEE/Rdata/20190306_pubsLRE.rda",mtz.LRE,mtz.OTR)
