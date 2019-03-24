@@ -103,16 +103,31 @@ list.authors %>% count(auth_alt2, sort = TRUE) ## poco
 list.authors %>% count(auth_alt3, sort = TRUE) ## mejor
 subset(list.authors,auth_alt3 %in% "butchart s")$valid_name
 
+## error en Ma Keeping y Ma...
+subset(list.authors,auth_alt3 %in% "ma z")$valid_name
+
+## dos autores diferentes
+subset(list.authors,auth_alt3 %in% "lei g")$valid_name
+subset(list.authors,auth_alt3 %in% "keith da")$valid_name
+
+for (bsc in c("ma z","lei g","keith da","murray nj","regan tj","wilson al")) {
+    list.authors[list.authors$auth_alt3 %in% bsc,"auth_alt3"] <- list.authors[list.authors$auth_alt3 %in% bsc,"valid_name"]
+}
+
 list.authors %>% count(auth_alt4, sort = TRUE) ## demasiado
 
 length(unique(list.authors$auth_alt3))
 length(unique(list.authors$valid_name))
 
 
-mtz <- as.matrix(with(subset(list.authors,doi %in% subset(RLEpubs,RLE)$DOI),table(doi,auth_alt3)))
+mtz.LRE <- as.matrix(with(subset(list.authors,doi %in% subset(RLEpubs,RLE)$DOI),table(doi,auth_alt3)))
+
+mtz.OTR <- as.matrix(with(subset(list.authors,doi %in% subset(RLEpubs,RLTS | KBA)$DOI),table(doi,auth_alt3)))
+##save(file="~/mi.git/CEBA.LEE/Rdata/20190306_pubsLRE.rda",mtz.LRE,mtz.OTR)
+save(file="~/mi.git/CEBA.LEE/Rdata/20190324_pubsLRE.rda",mtz.LRE,mtz.OTR,ref.info)
+
 co_occurrence1 <- t(mtz) %*% mtz
 
-mtz2 <- as.matrix(with(subset(list.authors,doi %in% subset(RLEpubs,RLTS | KBA)$DOI),table(doi,auth_alt3)))
 co_occurrence2 <- t(mtz2) %*% mtz2
 ##mtz <- mtz[,colSums(mtz)>1]
 ##mtz <- mtz[rowSums(mtz)>1,]
@@ -140,10 +155,16 @@ mb <- rev(sort(betweenness(g1)))[1:10]
 l1 <- layout_with_kk(g1)
 n <- V(g1)$name
 
-plot(g1, layout=l1,edge.arrow.size=.15, vertex.color="gold", vertex.size=sqrt(deg)/2,vertex.label=NA) ## vertex.label=ifelse(n %in% c(names(md),names(mc),names(mb)),n,NA)
+plot(g1, layout=l1,edge.arrow.size=.15, vertex.color=rgb(.2,.3,.4,.5), vertex.size=sqrt(deg)/2,vertex.label=NA) ## vertex.label=ifelse(n %in% c(names(md),names(mc),names(mb)),n,NA)
 
 par(mar=c(4,4,0,0))
-hist(deg, breaks=seq(0,vcount(g2),length=20), main="Histogram of node degree")
+hist(deg, breaks=seq(0,vcount(g2),length=20),
+     col=rgb(.2,.3,.4,.5),main="Histogram of node degree")
+
+cfg <- cluster_fast_greedy(g1)
+membership(cfg)
+sizes(cfg)
+
 
 par(mar=c(0,0,1,0))
 
@@ -161,14 +182,30 @@ mb <- rev(sort(betweenness(g2)))[1:10]
 l2 <- layout_with_kk(g2)
 n <- V(g2)$name
 
-plot(g2, layout=l2,edge.arrow.size=.15, vertex.color="gold", vertex.size=sqrt(deg)/2,vertex.label=NA)
+plot(g2, layout=l2,edge.arrow.size=.15, vertex.color=rgb(.4,.3,.2,.5), vertex.size=sqrt(deg)/2,vertex.label=NA)
      ##vertex.label=ifelse(n %in% c(names(md),names(mc),names(mb)),n,NA))
 
 par(mar=c(4,4,0,0))
 hist(deg, breaks=seq(0,vcount(g2),length=20), main="Histogram of node degree")
+centr_degree(g1, mode="all", normalized=T)
+centr_degree(g2, mode="all", normalized=T)
+centr_eigen(g1, directed=T, normalized=T)$centralization
+centr_eigen(g2, directed=T, normalized=T)$centralization
+centr_betw(g1, directed=T, normalized=T)$centralization
+centr_betw(g2, directed=T, normalized=T)$centralization
 
+## not well defined for disconnected graphs
+##centr_clo(g1, mode="all", normalized=T) 
+## number of clusters
+clusters(g1)$no
+clusters(g2)$no
+graph.density(g1)
+graph.density(g2)
+mean_distance(g1)
+mean_distance(g2)
 
-
+transitivity(g1, type="average")
+ transitivity(g2, type="average")
 
 ################
 ##
